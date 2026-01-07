@@ -14,7 +14,7 @@
             --btn-bg: #f3f4f6;
             --btn-text: #111827;
             --panel-bg: rgba(255, 255, 255, 0.9);
-            /* 新增：用于存储当前玩家悬停颜色的变量 */
+         
             --hover-color: #2563eb; 
         }
 
@@ -40,7 +40,7 @@
             min-height: 100vh; overflow: hidden; transition: all 0.5s ease;
         }
 
-        /* SPLASH SCREEN */
+     
         #splash {
             position: fixed; inset: 0; background: #000; z-index: 9999;
             display: flex; flex-direction: column; align-items: center; justify-content: center;
@@ -99,11 +99,11 @@
             transition: 0.2s;
         }
 
-        /* 核心改进部分：鼠标悬停时显示当前玩家的颜色 */
+       
         .cell:hover:not(:has(span)) {
             transform: scale(1.05);
-            border-color: var(--hover-color); /* 使用动态变量 */
-            box-shadow: 0 0 20px var(--hover-color); /* 增加发光效果 */
+            border-color: var(--hover-color); 
+            box-shadow: 0 0 20px var(--hover-color);
             background: rgba(255, 255, 255, 0.05);
         }
 
@@ -354,20 +354,19 @@
             });
         }
 
-        // 核心功能点：更新状态时同时更新 CSS 变量中的悬停颜色
+      
         function updateStatus() {
             if(!gameActive) return;
             statusEl.innerText = isBotThinking ? "BOT THINKING..." : (gameMode === 'pve' && currentPlayer === 'X' ? "YOUR TURN" : "PLAYER " + currentPlayer);
             
-            // 获取当前主题下的准确颜色
             const style = getComputedStyle(document.body);
             const xColor = style.getPropertyValue('--primary').trim();
             const oColor = style.getPropertyValue('--o-color').trim();
             
-            // 设置状态栏文字颜色
+     
             statusEl.style.color = currentPlayer === "X" ? xColor : oColor;
+         
             
-            // 设置 CSS 悬停颜色变量
             document.documentElement.style.setProperty('--hover-color', currentPlayer === "X" ? xColor : oColor);
         }
 
@@ -402,4 +401,5 @@
         }
     </script>
 </body>
+
 </html>
