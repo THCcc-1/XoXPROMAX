@@ -1,0 +1,372 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>XOX PRO MAX - ULTIMATE EDITION</title>
+    <style>
+        :root {
+            --primary: #2563eb;
+            --o-color: #db2777;
+            --card-bg: #ffffff;
+            --text-main: #111827;
+            --board-glow: #cbd5e1;
+            --btn-bg: #f3f4f6;
+            --btn-text: #111827;
+            --panel-bg: rgba(255, 255, 255, 0.9);
+        }
+
+        body.cyberpunk {
+            background: #050a14;
+            --card-bg: #0d1117;
+            --text-main: #ffffff;
+            --primary: #00f2ff;
+            --o-color: #dd4c92;
+            --btn-bg: #1e293b;
+            --btn-text: #00f2ff;
+            --panel-bg: rgba(13, 17, 23, 0.9);
+        }
+
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+
+        body {
+            font-family: 'Arial Black', sans-serif;
+            background: linear-gradient(135deg, #cbd5e1 0%, #94a3b8 100%);
+            color: var(--text-main);
+            display: flex; flex-direction: column; align-items: center; justify-content: center;
+            min-height: 100vh; overflow: hidden; transition: all 0.5s ease;
+        }
+
+        /* SPLASH SCREEN */
+        #splash {
+            position: fixed; inset: 0; background: #000; z-index: 9999;
+            display: flex; flex-direction: column; align-items: center; justify-content: center;
+            color: #00f2ff; cursor: pointer; text-align: center;
+        }
+
+        /* TITLE ANIMATION */
+        h1.main-title {
+            font-size: clamp(3rem, 12vw, 5rem);
+            margin-bottom: 20px;
+            color: var(--primary);
+            text-align: center;
+            animation: cyberPulse 3s infinite ease-in-out;
+            letter-spacing: -2px;
+        }
+
+        @keyframes cyberPulse {
+            0%, 100% { transform: scale(1); text-shadow: 0 0 20px var(--primary); color: var(--primary); }
+            50% { transform: scale(1.05); text-shadow: 0 0 40px var(--o-color); color: var(--o-color); }
+        }
+
+        /* GIANT SETTINGS UI */
+        .controls { 
+            position: absolute; top: 20px; right: 20px; z-index: 100; 
+            display: flex; flex-direction: column; gap: 15px; align-items: stretch;
+            background: var(--panel-bg); padding: 25px; border-radius: 25px;
+            border: 4px solid var(--primary); width: 260px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+        }
+        .vol-group { display: flex; flex-direction: column; gap: 10px; }
+        .vol-group label { font-size: 1rem; font-weight: 900; color: var(--text-main); text-align: center; }
+        input[type=range] { 
+            width: 100%; height: 20px; accent-color: var(--primary); cursor: pointer; 
+        }
+
+        /* CONTAINER & BOARD */
+        .container {
+            background: var(--card-bg); padding: 2.5rem; border-radius: 40px;
+            box-shadow: 0 40px 100px rgba(0,0,0,0.4); width: 95%; max-width: 550px;
+            border: 10px solid var(--board-glow); transition: border-color 0.4s ease;
+            position: relative;
+        }
+
+        .status {
+            font-size: 2.2rem; font-weight: 900; margin-bottom: 20px; min-height: 3.5rem;
+            text-transform: uppercase; color: var(--text-main); text-shadow: 2px 2px 0px rgba(0,0,0,0.2);
+        }
+
+        .board {
+            display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px;
+            max-width: 440px; margin: 0 auto 20px auto;
+        }
+
+        .cell {
+            aspect-ratio: 1/1; background: rgba(128, 128, 128, 0.15); 
+            border: 4px solid var(--text-main); border-radius: 15px;
+            display: flex; align-items: center; justify-content: center;
+            font-size: clamp(2rem, 8vw, 3.5rem); cursor: pointer; position: relative;
+            transition: 0.2s;
+        }
+
+        .cell:hover:not(:has(span)) {
+            transform: scale(1.1); border-color: var(--primary);
+            box-shadow: 0 0 25px var(--primary); background: rgba(255,255,255,0.1);
+        }
+
+        /* GAME ANIMATIONS */
+        @keyframes boardShake {
+            0%, 100% { transform: translateX(0); }
+            25% { transform: translateX(-8px); }
+            75% { transform: translateX(8px); }
+        }
+        .illegal-shake { animation: boardShake 0.2s ease-in-out 2; }
+
+        @keyframes spinDissolve {
+            0% { opacity: 1; transform: scale(1) rotate(0deg); filter: blur(0); }
+            100% { opacity: 0.1; transform: scale(0.5) rotate(360deg); filter: blur(8px); }
+        }
+        .cell.fading span { animation: spinDissolve 1.2s infinite linear; }
+        .cell.winner-cell { background: #22c55e !important; color: white !important; animation: winPulse 0.4s infinite alternate; z-index: 10; }
+        @keyframes winPulse { 0% { transform: scale(1); } 100% { transform: scale(1.1); } }
+
+        /* BIG BUTTONS */
+        button {
+            padding: 24px; font-size: 1.5rem; font-weight: 900; cursor: pointer;
+            background: var(--btn-bg); color: var(--btn-text); border: 5px solid var(--primary);
+            border-radius: 20px; width: 100%; margin: 12px 0; text-transform: uppercase;
+            box-shadow: 0 6px 0 var(--primary); transition: all 0.1s;
+        }
+        button:active { transform: translateY(4px); box-shadow: 0 2px 0 var(--primary); }
+        button:hover { background: var(--primary); color: #fff !important; }
+
+        .vanishing-text {
+            position: absolute; bottom: 5px; font-size: 0.6rem; color: #ff0000;
+            font-weight: 900; background: #000; padding: 2px 5px; border-radius: 4px;
+        }
+
+        .hidden { display: none !important; }
+    </style>
+</head>
+<body class="cyberpunk">
+
+    <div id="splash" onclick="startApp()">
+        <h1 class="main-title">XOX PRO MAX</h1>
+        <p style="font-size: 1.5rem; margin-top: 20px;">[ CLICK TO START ]</p>
+    </div>
+
+    <audio id="bg-music" src="bgm.mp3" loop></audio>
+    <audio id="audio-win" src="celebration.mp3"></audio>
+    <audio id="audio-lose" src="sad.mp3"></audio>
+
+    <div class="controls">
+        <div class="vol-group">
+            <label>GAME VOLUME</label>
+            <input type="range" id="vol-slider" min="0" max="1" step="0.01" value="0.4">
+        </div>
+        <button onclick="document.body.classList.toggle('cyberpunk')" style="font-size: 1rem; padding:15px; width: 100%; margin:0; box-shadow:none;">SWITCH THEME</button>
+    </div>
+
+    <h1 class="main-title">XOX PRO MAX</h1>
+
+    <div class="container" id="game-container">
+        <div id="menu-view">
+            <button onclick="chooseMode('pve')">SINGLE PLAYER</button>
+            <button onclick="chooseMode('pvp')">TWO PLAYERS</button>
+        </div>
+
+        <div id="diff-view" class="hidden">
+            <p style="font-size: 1.8rem; margin-bottom: 20px; text-align:center;">AI DIFFICULTY <br> CTRL+R to return</p>
+            <button onclick="setupPVE('easy')">EASY MODE</button>
+            <button onclick="setupPVE('hard')">HARD MODE</button>
+        </div>
+
+        <div id="roulette-view" class="hidden">
+            <div id="roulette-txt" style="font-size: 3.5rem; color: var(--primary); height: 180px; display: flex; flex-direction: column; align-items: center; justify-content: center; text-align:center;">?</div>
+        </div>
+
+        <div id="game-view" class="hidden">
+            <div id="status" class="status">READY?</div>
+            <div id="timer" style="height: 30px; color: var(--o-color); font-weight: 900; font-size: 1.2rem;"></div>
+            <div class="board" id="board"></div>
+            <button onclick="resetToMenu()" style="font-size: 1rem; padding: 15px; width: auto; box-shadow: none;">QUIT GAME</button>
+        </div>
+    </div>
+
+    <script>
+        let boardArr = Array(16).fill("");
+        let moveHistory = [];
+        let currentPlayer = "X";
+        let gameActive = false;
+        let isBotThinking = false;
+        let difficulty = "hard";
+        let gameMode = "pvp";
+        let winningLine = null;
+
+        const bgMusic = document.getElementById('bg-music');
+        const volSlider = document.getElementById('vol-slider');
+        const statusEl = document.getElementById('status');
+        const containerEl = document.getElementById('game-container');
+        const boardEl = document.getElementById('board');
+
+        const winCombos = [];
+        for(let i=0; i<4; i++) {
+            winCombos.push([i*4, i*4+1, i*4+2, i*4+3]); 
+            winCombos.push([i, i+4, i+8, i+12]);       
+        }
+        winCombos.push([0, 5, 10, 15], [3, 6, 9, 12]);
+
+        function startApp() {
+            document.getElementById('splash').classList.add('hidden');
+            bgMusic.play();
+            bgMusic.volume = volSlider.value;
+        }
+
+        volSlider.oninput = () => { bgMusic.volume = volSlider.value; };
+
+        // Initialize Board Cells
+        for(let i=0; i<16; i++) {
+            const cell = document.createElement('div');
+            cell.className = 'cell';
+            cell.onclick = () => handleMove(i);
+            boardEl.appendChild(cell);
+        }
+
+        function chooseMode(m) {
+            gameMode = m;
+            if(m === 'pvp') startGame();
+            else switchView('menu-view', 'diff-view');
+        }
+
+        function setupPVE(d) {
+            difficulty = d;
+            switchView('diff-view', 'roulette-view');
+            
+            const mood = Math.random() > 0.5 ? "DEFENSIVE" : "AGGRESSIVE";
+            containerEl.style.borderColor = mood === "DEFENSIVE" ? "#22c55e" : "#ef4444";
+
+            let count = 0;
+            const rouletteTxt = document.getElementById('roulette-txt');
+            const interval = setInterval(() => {
+                rouletteTxt.innerText = count++ % 2 ? "BOT" : "YOU";
+                if(count > 12) {
+                    clearInterval(interval);
+                    const starter = Math.random() > 0.5 ? "BOT" : "YOU";
+                    rouletteTxt.innerHTML = `<span style="font-size:1.5rem">DECIDED:</span><br>${starter} FIRST!`;
+                    
+                    setTimeout(() => {
+                        startGame();
+                        if(starter === "BOT") { currentPlayer = "O"; botTurn(); }
+                    }, 1500);
+                }
+            }, 100);
+        }
+
+        function startGame() {
+            document.querySelectorAll('.container > div').forEach(v => v.classList.add('hidden'));
+            document.getElementById('game-view').classList.remove('hidden');
+            gameActive = true;
+            updateStatus();
+        }
+
+        function handleMove(i) {
+            if(!gameActive) return;
+            if(isBotThinking || boardArr[i] !== "") {
+                containerEl.classList.remove('illegal-shake');
+                void containerEl.offsetWidth; 
+                containerEl.classList.add('illegal-shake');
+                return;
+            }
+            applyMove(i);
+            if(gameActive && gameMode === 'pve' && currentPlayer === "O") botTurn();
+        }
+
+        function applyMove(i) {
+            boardArr[i] = currentPlayer;
+            moveHistory.push(i);
+            if(moveHistory.length > 8) boardArr[moveHistory.shift()] = "";
+            
+            render();
+            const win = winCombos.find(c => c.every(idx => boardArr[idx] === currentPlayer));
+            
+            if(win) {
+                winningLine = win;
+                render();
+                gameActive = false;
+                statusEl.innerText = (gameMode==='pve' && currentPlayer==='X' ? "YOU WON!" : "WINNER: " + currentPlayer);
+                document.getElementById(currentPlayer==='X' ? 'audio-win' : 'audio-lose').play();
+                startResetTimer();
+                return;
+            }
+
+            currentPlayer = currentPlayer === "X" ? "O" : "X";
+            updateStatus();
+        }
+
+        function botTurn() {
+            isBotThinking = true;
+            updateStatus();
+            setTimeout(() => {
+                let move = (difficulty === 'hard') ? (findBest("O") || findBest("X")) : null;
+                if(move === null) {
+                    let avail = boardArr.map((v, i) => v === "" ? i : null).filter(v => v !== null);
+                    move = avail[Math.floor(Math.random() * avail.length)];
+                }
+                if(move !== null) applyMove(move);
+                isBotThinking = false;
+                updateStatus();
+            }, 1000);
+        }
+
+        function findBest(p) {
+            for(let c of winCombos) {
+                let match = c.filter(idx => boardArr[idx] === p).length;
+                let empty = c.filter(idx => boardArr[idx] === "").length;
+                if(match === 3 && empty === 1) return c.find(idx => boardArr[idx] === "");
+            }
+            return null;
+        }
+
+        function render() {
+            const cells = document.querySelectorAll('.cell');
+            cells.forEach((cell, i) => {
+                cell.innerHTML = boardArr[i] ? `<span>${boardArr[i]}</span>` : "";
+                cell.classList.remove('fading', 'winner-cell');
+                if(boardArr[i]) {
+                    cell.querySelector('span').style.color = boardArr[i] === "X" ? "var(--primary)" : "var(--o-color)";
+                }
+                if(winningLine && winningLine.includes(i)) cell.classList.add('winner-cell');
+                if(!winningLine && moveHistory.length === 8 && i === moveHistory[0]) {
+                    cell.classList.add('fading');
+                    const lbl = document.createElement('div');
+                    lbl.className = 'vanishing-text'; lbl.innerText = "VANISHING IN NEXT ROUND";
+                    cell.appendChild(lbl);
+                }
+            });
+        }
+
+        function updateStatus() {
+            if(!gameActive) return;
+            statusEl.innerText = isBotThinking ? "BOT THINKING..." : (gameMode === 'pve' && currentPlayer === 'X' ? "YOUR TURN" : "PLAYER " + currentPlayer);
+            statusEl.style.color = currentPlayer === "X" ? "var(--primary)" : "var(--o-color)";
+        }
+
+        function switchView(h, s) {
+            document.getElementById(h).classList.add('hidden');
+            document.getElementById(s).classList.remove('hidden');
+        }
+
+        function startResetTimer() {
+            let s = 5;
+            const t = setInterval(() => {
+                document.getElementById('timer').innerText = `BACK TO MENU IN ${s--}S`;
+                if(s < 0) { clearInterval(t); resetToMenu(); }
+            }, 1000);
+        }
+
+        function resetToMenu() {
+            boardArr.fill("");
+            moveHistory.length = 0;
+            winningLine = null;
+            currentPlayer = "X";
+            gameActive = false;
+            isBotThinking = false;
+            containerEl.style.borderColor = "var(--board-glow)";
+            document.getElementById('timer').innerText = "";
+            render();
+            document.querySelectorAll('.container > div').forEach(v => v.classList.add('hidden'));
+            document.getElementById('menu-view').classList.remove('hidden');
+        }
+    </script>
+</body>
+</html>
